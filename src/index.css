@@ -1,13 +1,128 @@
-body {
+body, html {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: auto; /* 確保整個頁面可以滾動 */
+  background-color: #fff64f;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.App {
+  width: 100%;
+  min-height: 100vh; /* 確保至少覆蓋整個視窗高度 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; 
+  padding: 30px; 
+  box-sizing: border-box;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* 陰影效果 */
+  overflow: auto; 
+}
+
+/* 通用輸入框和按鈕的樣式 */
+input[type="text"], button {
+  padding: 12px; /* 增加內邊距 */
+  margin: 12px 0; /* 增加外邊距 */
+  border-radius: 6px; /* 更圓的邊角 */
+  border: 1px solid #ccc; /* 邊框顏色 */
+  width: 100%;
+  max-width: 350px; /* 增加最大寬度 */
+  font-size: 18px; /* 增加字體大小 */
+  box-sizing: border-box;
+  transition: border 0.3s; /* 增加邊框過渡效果 */
+}
+
+input[type="text"]:focus {
+  border: 1px solid #007bff; /* 聚焦時改變邊框顏色 */
+}
+
+button {
+  cursor: pointer;
+  background-color: #5c6bc0; /* 活潑的藍色 */
+  color: white;
+  border: none;
+  transition: background-color 0.3s, transform 0.2s; /* 增加變形效果 */
+  font-size: 18px; /* 增加字體大小 */
+}
+
+button:hover {
+  background-color: #3f51b5; /* 懸停時的顏色 */
+  transform: translateY(-2px); /* 懸停時輕微向上移動 */
+}
+
+/* 標題和文本的樣式 */
+h2 {
+  font-size: 28px; /* 增加字體大小 */
+  margin: 25px 0; /* 增加上下邊距 */
+  text-align: center;
+  color: #2e7d32; /* 綠色標題 */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* 輕微的文字陰影 */
+}
+
+h3 {
+  font-size: 22px; /* 增加字體大小 */
+  margin: 20px 0; /* 增加上下邊距 */
+  color: #555;
+}
+
+p, li {
+  font-size: 18px; /* 增加字體大小 */
+  margin: 10px 0; /* 增加上下邊距 */
+  color: #444;
+}
+
+/* 房間成員列表的樣式 */
+ul {
+  list-style-type: none; /* 無序列表樣式 */
+  padding: 0; /* 取消內邊距 */
+}
+
+li {
+  background-color: #e1f5fe; /* 淺藍色背景 */
+  padding: 10px;
+  border: 1px solid #b0bec5; /* 淺灰色邊框 */
+  border-radius: 6px; /* 更圓的邊角 */
+  margin: 8px 0; /* 增加上下邊距 */
+  width: 100%;
+  max-width: 350px; /* 增加最大寬度 */
+}
+
+/* 響應式處理，適應不同裝置大小 */
+@media (max-width: 768px) {
+  .App {
+      padding: 15px; /* 減少內邊距 */
+  }
+
+  input[type="text"], button {
+      max-width: 100%; /* 調整輸入框和按鈕的最大寬度 */
+  }
+
+  h2, h3, p, li {
+      font-size: 16px; /* 調整字體大小 */
+  }
+}
+
+.notifications {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000; 
+}
+
+.notification {
+  background-color: rgba(0, 123, 255, 0.9); /* 藍色背景 */
+  color: white;
+  padding: 12px;
+  margin: 5px;
+  border-radius: 6px; /* 更圓的邊角 */
+  transition: opacity 0.5s ease;
+  animation: fadeInOut 3s; /* 加入淡入淡出動畫 */
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
 }
