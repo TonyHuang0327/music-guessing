@@ -5,9 +5,8 @@ body, html {
   height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   overflow: auto; /* 確保整個頁面可以滾動 */
-  background-color: #fff64f;
+  background-size: cover;
 }
-
 .App {
   width: 100%;
   min-height: 100vh; /* 確保至少覆蓋整個視窗高度 */
@@ -20,7 +19,13 @@ body, html {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* 陰影效果 */
   overflow: auto; 
 }
-
+.inputBox-div{
+  display: flex;
+  flex-direction: column; /* 垂直排列輸入框 */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
 /* 通用輸入框和按鈕的樣式 */
 input[type="text"], button {
   padding: 12px; /* 增加內邊距 */
@@ -38,26 +43,46 @@ input[type="text"]:focus {
   border: 1px solid #007bff; /* 聚焦時改變邊框顏色 */
 }
 
+.buttonDiv{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 10px;
+}
+
 button {
-  cursor: pointer;
-  background-color: #5c6bc0; /* 活潑的藍色 */
-  color: white;
-  border: none;
-  transition: background-color 0.3s, transform 0.2s; /* 增加變形效果 */
-  font-size: 18px; /* 增加字體大小 */
+  display: inline-block;
+  background: #ffffff;
+  color: #000;
+  max-width: 150px;
+  height:fit-content;
+  line-height: 40px;
+  width: 100%;
+  font-size: 215x;
+  text-align: center;
+  font-weight: 500;
+  border-radius: 40px;
+  transition: ease-in all 0.5s;
 }
 
 button:hover {
-  background-color: #3f51b5; /* 懸停時的顏色 */
   transform: translateY(-2px); /* 懸停時輕微向上移動 */
 }
 
+/* 按下效果 */
+button:active {
+  background-color: #5a76e5; /* 改變顏色 */
+  transform: scale(0.95);
+}
+
+
 /* 標題和文本的樣式 */
 h2 {
-  font-size: 28px; /* 增加字體大小 */
-  margin: 25px 0; /* 增加上下邊距 */
+  font-size: 40px; /* 增加字體大小 */
+  margin: 0px 0; /* 增加上下邊距 */
   text-align: center;
-  color: #2e7d32; /* 綠色標題 */
+  color: #ffffff; /* 綠色標題 */
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* 輕微的文字陰影 */
 }
 
@@ -65,28 +90,79 @@ h3 {
   font-size: 22px; /* 增加字體大小 */
   margin: 20px 0; /* 增加上下邊距 */
   color: #555;
+  text-align: center;
 }
 
 p, li {
-  font-size: 18px; /* 增加字體大小 */
-  margin: 10px 0; /* 增加上下邊距 */
-  color: #444;
+  font-size: 16px; /* 增加字體大小 */
+  margin: 0px 0; /* 增加上下邊距 */
+  color:black;
 }
 
 /* 房間成員列表的樣式 */
 ul {
   list-style-type: none; /* 無序列表樣式 */
   padding: 0; /* 取消內邊距 */
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
 
 li {
-  background-color: #e1f5fe; /* 淺藍色背景 */
-  padding: 10px;
-  border: 1px solid #b0bec5; /* 淺灰色邊框 */
-  border-radius: 6px; /* 更圓的邊角 */
-  margin: 8px 0; /* 增加上下邊距 */
-  width: 100%;
-  max-width: 350px; /* 增加最大寬度 */
+  background-color: #efeff1;
+  padding:5px;
+  border: 1.5px solid #000000;
+  border-radius: 50px; /* 更圓的邊角 */
+  margin: 5px 0; /* 增加上下邊距 */
+  width: 90%;
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap; /* 允许换行 */
+  justify-content: center; /* 按钮从中間开始排列 */
+  max-width: 600px; /* 根据需要设置容器最大宽度 */
+  margin: 0 auto; /* 居中对齐 */
+}
+
+.optionButton{
+  width: 100px; /* 固定宽度 */
+  height: 100px; /* 固定高度 */
+  margin: 5px; /* 按钮之间的水平和垂直间距 */
+  font-size: 14px; /* 字体大小 */
+  color: white; /* 字体颜色 */
+  background-color: #00ff2f; /* 按钮背景颜色 */
+  border: 2px solid white; /* 白色边框 */
+  border-radius: 5px; /* 圆角 */
+  cursor: pointer; /* 鼠标悬停时变成手型光标 */
+  display: flex; /* 使用 flexbox 使文本居中 */
+  align-items: center; /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
+  text-align: center; /* 文本居中对齐 */
+  overflow: hidden;
+  line-height: 1;
+}
+
+.gameContainer {
+  display: flex; /* 使用 flexbox */
+  justify-content: space-between; /* 左右分布 */
+  align-items: flex-start; /* 垂直对齐 */
+  max-width: 100%; /* 让容器宽度占满页面 */
+  height: 100%; /* 根据需要设置高度 */
+}
+
+.gamingArea {
+  flex: 0 0 60%; /* 占 60% 的宽度 */
+  padding: 20px; /* 内边距可根据需要调整 */
+  box-sizing: border-box; /* 包含内边距在宽度计算中 */
+}
+
+.leaderBoard {
+  flex: 0 0 30%; /* 占 30% 的宽度 */
+  padding: 20px; /* 内边距可根据需要调整 */
+  box-sizing: border-box; /* 包含内边距在宽度计算中 */
+  overflow-y: auto; /* 如果内容溢出，则启用垂直滚动 */
 }
 
 /* 響應式處理，適應不同裝置大小 */
@@ -125,4 +201,31 @@ li {
   0% { opacity: 1; }
   90% { opacity: 1; }
   100% { opacity: 0; }
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #c9cbe0;
+  padding: 20px;
+  border-radius: 5px;
+  width: 300px;
+  height: fit-content;
+}
+
+.close {
+  cursor: pointer;
+  float: right;
+  font-size: 20px;
 }

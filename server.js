@@ -68,15 +68,17 @@ io.on('connection', (socket) => {
     console.log(`Player ${nickname} is trying to join room ${room}`);
     
     socket.join(room);
-    if (!rooms.has(room)) {
-      console.log(`Room ${room} does not exist. Creating new room and setting host.`);
-      rooms.set(room, { players: new Map(), currentSong: null, timer: null, submittedAnswers: [], gameStarted: false, host: socket.id });
-      activeRooms.add(room);
-      io.to(socket.id).emit('setHost', true); // 通知該玩家是房主
-    } else {
-      console.log(`Room ${room} already exists. Player ${nickname} joining as a participant.`);
-      io.to(socket.id).emit('setHost', false); // 不是房主
-    }
+    // 判斷房間是否已存在
+  if (!rooms.has(room)) {
+    console.log(`Room ${room} does not exist. Creating new room and setting host.`);
+    rooms.set(room, { players: new Map(), currentSong: null, timer: null, submittedAnswers: [], gameStarted: false, host: socket.id });
+    activeRooms.add(room);
+    io.to(socket.id).emit('setHost', true); // 通知該玩家是房主
+    console.log(`Player ${nickname} is joining as a host.`);
+  } else {
+    console.log(`Room ${room} already exists. Player ${nickname} joining as a participant.`);
+    io.to(socket.id).emit('setHost', false); // 不是房主
+  }
   
     // 新玩家加入房間
     rooms.get(room).players.set(socket.id, { nickname, score: 0 });
@@ -89,7 +91,7 @@ io.on('connection', (socket) => {
 
   socket.on('startGame', (room) => {
     const roomData = rooms.get(room);
-    if (roomData && roomData.host === socket.id && roomData.players.size > 1 && !roomData.gameStarted) {
+    if (roomData && !roomData.gameStarted) {
       roomData.gameStarted = true;
       startCountdown(room);
     }
@@ -118,31 +120,48 @@ io.on('connection', (socket) => {
   socket.on('submitAnswer', ({ room, selectedOption, player }) => {
     const roomData = rooms.get(room);
     if (roomData && roomData.currentSong) {
-      const isCorrect = roomData.currentSong.correctAnswer === selectedOption;
-      const playerData = roomData.players.get(socket.id);
-      
-      // 確保每個玩家只能提交一次答案
-      if (!roomData.submittedAnswers.find(answer => answer.player === player)) {
-        roomData.submittedAnswers.push({ player, isCorrect });
-
-        // 如果答案正確，根據提交順序給予不同分數
-        if (isCorrect) {
-          const correctRank = roomData.submittedAnswers.filter(a => a.isCorrect).length;
-          const score = correctRank === 1 ? 30 : (correctRank === 2 ? 20 : 10);
-          playerData.score += score;
-          io.to(room).emit('updateScore', { player, score: playerData.score });
+        const isCorrect = roomData.currentSong.correctAnswer === selectedOption;
+        const playerData = Array.from(roomData.players.values()).find(p => p.nickname === player);
+        
+        // 確保找到玩家數據
+        if (!playerData) {
+            console.log(`Player ${player} not found in room ${room}`);
+            return;
         }
-
-        // 檢查是否所有玩家都已提交答案
-        if (roomData.submittedAnswers.length === roomData.players.size) {
-          stopCurrentSong(room);
-          setTimeout(() => {
-            startNewRound(room);
-          }, 2000); // 所有玩家提交後等待 2 秒進入下一輪
+        
+        // 確保每個玩家只能提交一次答案
+        if (!roomData.submittedAnswers.find(answer => answer.player === player)) {
+            roomData.submittedAnswers.push({ player, isCorrect });
+            
+            console.log(`Player ${player} submitted answer. Correct: ${isCorrect}`);
+            
+            // 如果答案正確，根據提交順序給予不同分數
+            if (isCorrect) {
+                const correctAnswers = roomData.submittedAnswers.filter(a => a.isCorrect);
+                const correctRank = correctAnswers.length;
+                const score = correctRank === 1 ? 30 : (correctRank === 2 ? 20 : 10);
+                
+                // 更新玩家分數
+                playerData.score += score;
+                console.log(`Player ${player} score updated to ${playerData.score}`);
+                
+                // 發送更新後的分數給所有客戶端
+                io.to(room).emit('updateScore', {
+                    player: player,
+                    score: playerData.score
+                });
+            }
+            
+            // 檢查是否所有玩家都已提交答案
+            if (roomData.submittedAnswers.length === roomData.players.size) {
+                stopCurrentSong(room);
+                setTimeout(() => {
+                    startNewRound(room);
+                }, 3000);
+            }
         }
-      }
     }
-  });
+});
 
   socket.on('endGame', (room) => {
     const roomData = rooms.get(room);
