@@ -9,7 +9,7 @@ const app = express();
 app.use(express.static('music-database'));
 
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: "https://music-guessing.vercel.app/",
     methods: ["GET", "POST"],
     credentials: true
 }));
@@ -17,7 +17,7 @@ app.use(cors({
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://music-guessing.vercel.app/",
     methods: ["GET", "POST"],
     credentials: true
   }
