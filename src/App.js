@@ -3,30 +3,39 @@ import GameBoard from './GameBoard';
 import ResultBoard from './ResultBoard';
 import { socket } from './socket';
 import LoginRoom from './LoginRoom';
-import ActiveRooms from './ActiveRooms';
 
 function App() {
   const [gameState, setGameState] = useState('login');
   const [nickname, setNickname] = useState('');
   const [room, setRoom] = useState('');
+  const [roomLanguage, setRoomLanguage] = useState(''); // 新增 roomLanguage 狀態
   const [scores, setScores] = useState({});
 
-  const handleStartGame = (name, roomName) => {
+  const handleStartGame = (name, roomName, selectedLanguage) => {
     setNickname(name);
     setRoom(roomName);
+    setRoomLanguage(selectedLanguage); // 更新 roomLanguage
     socket.emit('joinRoom', { room: roomName, nickname: name });
     setGameState('game');
   };
 
-  const handleEndGame = () => {
-    socket.emit('endGame', room);
+  // 新增 handleJoinRoom 函數
+  const handleJoinRoom = (name, roomName) => {
+    setNickname(name);
+    setRoom(roomName);
+    setGameState('game');
+  };
+
+  const handleEndGame = (finalScores) => {
+    socket.emit('endGame', { room, finalScores }); // 将分数发送到服务器
     setGameState('result');
-  };  
+  };
 
   const handlePlayAgain = () => {
     setGameState('login');
     setNickname('');
     setRoom('');
+    setRoomLanguage(''); // 重置 roomLanguage
     setScores({});
   };
 
@@ -34,13 +43,14 @@ function App() {
     <div className="app-container">
       {gameState === 'login' && (
         <div className="login-container">
-          <LoginRoom onStartGame={handleStartGame} onJoinRoom={handleStartGame} />
+          <LoginRoom onStartGame={handleStartGame} onJoinRoom={handleJoinRoom} />
         </div>
       )}
       {gameState === 'game' && (
         <GameBoard
           nickname={nickname}
           room={room}
+          roomLanguage={roomLanguage} // 傳遞 roomLanguage 給 GameBoard
           onEndGame={handleEndGame}
         />
       )}

@@ -29,6 +29,13 @@ const spotifyApi = new SpotifyWebApi({
   clientSecret: '685b0f2ef62d45e580f765be567be29f'
 });
 
+const playlists = {
+  ch:'16jltto6nfMRPONB8hzKQ4',//中文
+  kp:'37i9dQZF1EIVNsGbEqyF9o',//kpop
+  jp:'37i9dQZF1DXdbRLJPSmnyq',//jpop
+  en:'37i9dQZF1DX5Ejj0EkURtP',//英文
+};
+
 // 取得 Spotify token
 spotifyApi.clientCredentialsGrant().then(
   function(data) {
@@ -71,7 +78,7 @@ io.on('connection', (socket) => {
     // 判斷房間是否已存在
   if (!rooms.has(room)) {
     console.log(`Room ${room} does not exist. Creating new room and setting host.`);
-    rooms.set(room, { players: new Map(), currentSong: null, timer: null, submittedAnswers: [], gameStarted: false, host: socket.id });
+    rooms.set(room, { players: new Map(), currentSong: null, timer: null, submittedAnswers: [], gameStarted: false, host: socket.id,roomLanguage: null });
     activeRooms.add(room);
     io.to(socket.id).emit('setHost', true); // 通知該玩家是房主
     console.log(`Player ${nickname} is joining as a host.`);
@@ -89,11 +96,12 @@ io.on('connection', (socket) => {
   });
   
 
-  socket.on('startGame', (room) => {
+  socket.on('startGame', (room,roomLanguage) => {
     const roomData = rooms.get(room);
     if (roomData && !roomData.gameStarted) {
+      roomData.roomLanguage = roomLanguage;
       roomData.gameStarted = true;
-      startCountdown(room);
+      startCountdown(room,roomLanguage);
     }
   });
 
@@ -117,7 +125,7 @@ io.on('connection', (socket) => {
     socket.emit('activeRooms', Array.from(activeRooms));
   });
 
-  socket.on('submitAnswer', ({ room, selectedOption, player }) => {
+  socket.on('submitAnswer', ({ room, selectedOption, player}) => {
     const roomData = rooms.get(room);
     if (roomData && roomData.currentSong) {
         const isCorrect = roomData.currentSong.correctAnswer === selectedOption;
@@ -157,7 +165,7 @@ io.on('connection', (socket) => {
                 stopCurrentSong(room);
                 setTimeout(() => {
                     startNewRound(room);
-                }, 3000);
+                }, 1000);
             }
         }
     }
@@ -221,6 +229,7 @@ io.on('connection', (socket) => {
 // 修改 startNewRound 函數，確保在開始新回合前停止當前歌曲
 function startNewRound(room) {
   const roomData = rooms.get(room);
+  const playlistId = playlists[roomData.roomLanguage];
   if (roomData) {
     // 確保先停止當前歌曲
     stopCurrentSong(room);
@@ -230,7 +239,7 @@ function startNewRound(room) {
       // 重置提交答案列表
       roomData.submittedAnswers = [];
 
-      spotifyApi.getPlaylistTracks('37i9dQZF1EIVNsGbEqyF9o')
+      spotifyApi.getPlaylistTracks(playlistId)
         .then(data => {
           const tracks = data.body.items
             .filter(item => item.track)
@@ -272,9 +281,14 @@ function startNewRound(room) {
 function generateOptions(correctSong, room) {
   const options = [correctSong.title]; // 包含正確答案
   const roomData = rooms.get(room);
+  if (!roomData || !roomData.roomLanguage) {
+    console.log('Missing room data or language for generating options');
+    return;
+  }
+  const playlistId = playlists[roomData.roomLanguage];
 
   // 獲取歌曲的其他選項
-  spotifyApi.getPlaylistTracks('37i9dQZF1EIVNsGbEqyF9o') // 使用你的播放列表 ID
+  spotifyApi.getPlaylistTracks(playlistId) // 使用你的播放列表 ID
     .then(data => {
       const tracks = data.body.items
         .filter(item => item.track)

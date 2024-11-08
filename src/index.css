@@ -44,11 +44,14 @@ input[type="text"]:focus {
 }
 
 .buttonDiv{
+  padding-top: 40px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
+  flex-direction: column;
   width: 100%;
-  gap: 10px;
+  gap: 20px;
+  padding-bottom: 13px;
 }
 
 button {
@@ -64,6 +67,9 @@ button {
   font-weight: 500;
   border-radius: 40px;
   transition: ease-in all 0.5s;
+  margin: 0px;
+  border: 1.5px solid #000000;
+  animation: floatAnimation 2s ease-in-out infinite;
 }
 
 button:hover {
@@ -76,20 +82,46 @@ button:active {
   transform: scale(0.95);
 }
 
+button:nth-child(1) {
+  animation-delay: 0s; /* 第一個按鈕無延遲 */
+}
+
+button:nth-child(2) {
+  animation-delay: 0.2s; /* 第二個按鈕延遲 0.2 秒 */
+}
+
+button:nth-child(3) {
+  animation-delay: 0.4s; /* 第三個按鈕延遲 0.4 秒 */
+}
+
+@keyframes floatAnimation {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px); /* 向上浮動的距離 */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 
 /* 標題和文本的樣式 */
 h2 {
-  font-size: 40px; /* 增加字體大小 */
+  -webkit-text-stroke: 1.5px #555;
+  font-size: 50px; /* 增加字體大小 */
   margin: 0px 0; /* 增加上下邊距 */
   text-align: center;
-  color: #ffffff; /* 綠色標題 */
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* 輕微的文字陰影 */
+  color: rgba(0, 0, 0, 0);
+  font-style: italic;
+  text-shadow: 3px 3px 0 #C89EC4; /* 輕微的文字陰影 */
 }
 
 h3 {
   font-size: 22px; /* 增加字體大小 */
-  margin: 20px 0; /* 增加上下邊距 */
-  color: #555;
+  margin-top: 30px; /* 增加上下邊距 */
+  color: #84B1ED;
   text-align: center;
 }
 
@@ -109,7 +141,7 @@ ul {
 }
 
 li {
-  background-color: #efeff1;
+  background-color: #EFDC05;
   padding:5px;
   border: 1.5px solid #000000;
   border-radius: 50px; /* 更圓的邊角 */
@@ -118,30 +150,48 @@ li {
   text-align: center;
 }
 
-.button-container {
-  display: flex;
-  flex-wrap: wrap; /* 允许换行 */
-  justify-content: center; /* 按钮从中間开始排列 */
-  max-width: 600px; /* 根据需要设置容器最大宽度 */
-  margin: 0 auto; /* 居中对齐 */
+.leaderboard-item img {
+  max-width: 20px; /* 設定圖片的最大寬度 */
+  max-height: 20px; /* 設定圖片的最大高度 */
+  margin-left: 5px; /* 與文字保持適當間距 */
+  vertical-align: middle; /* 垂直置中對齊文字 */
 }
 
-.optionButton{
-  width: 100px; /* 固定宽度 */
-  height: 100px; /* 固定高度 */
-  margin: 5px; /* 按钮之间的水平和垂直间距 */
-  font-size: 14px; /* 字体大小 */
-  color: white; /* 字体颜色 */
-  background-color: #00ff2f; /* 按钮背景颜色 */
-  border: 2px solid white; /* 白色边框 */
-  border-radius: 5px; /* 圆角 */
-  cursor: pointer; /* 鼠标悬停时变成手型光标 */
-  display: flex; /* 使用 flexbox 使文本居中 */
-  align-items: center; /* 垂直居中 */
-  justify-content: center; /* 水平居中 */
-  text-align: center; /* 文本居中对齐 */
+
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* 讓所有按鈕居中 */
+  margin: 0 auto;
+  max-width: 80%;
+  height: max-content;
+}
+
+.optionButton {
+  width: 45%; /* 控制按鈕寬度占容器寬度的 45% */
+  max-width: 200px; /* 最大寬度限制 */
+  height: 200px; /* 固定高度 */
+  margin: 10px; /* 增加按鈕之間的間距 */
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
+  background-color: #00ff2f;
+  border: 2px solid black;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   overflow: hidden;
-  line-height: 1;
+  line-height: 1.2;
+
+  /* 使用 text-shadow 來模擬文字邊框 */
+  text-shadow: 
+    -1px -1px 0 #000, 
+     1px -1px 0 #000,
+    -1px  1px 0 #000, 
+     1px  1px 0 #000;
 }
 
 .gameContainer {
@@ -156,6 +206,56 @@ li {
   flex: 0 0 60%; /* 占 60% 的宽度 */
   padding: 20px; /* 内边距可根据需要调整 */
   box-sizing: border-box; /* 包含内边距在宽度计算中 */
+  text-align: center; /* 內容文字置中 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.rule {
+  border: 2px solid #4a4a4a; /* 更柔和的邊框顏色 */
+  background-color:rgba(255, 255, 255, 0.5); /* 添加淡色背景 */
+  border-radius: 8px; /* 圓角邊框 */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 添加陰影效果 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center; /* 置中 */
+  padding: 20px 25px; /* 增加內邊距 */
+  box-sizing: border-box;
+  max-width: 400px; /* 設定最大寬度 */
+  margin: 20px auto; /* 垂直居中 */
+}
+
+.rule h3 {
+  margin: 10px 0 15px 0; /* 上下邊距調整 */
+  color: #333; /* 深色標題 */
+  font-size: 24px; /* 增加字體大小 */
+}
+
+.rule ul {
+  padding: 0; /* 取消內邊距 */
+  margin: 0; /* 取消外邊距 */
+  list-style-type: none; /* 移除項目符號 */
+  width: 100%; /* 使列表佔滿容器寬度 */
+}
+
+.rule li {
+  text-align: left; /* 左對齊項目 */
+  background-color: #ffffff; /* 白色背景 */
+  border-radius: 5px; /* 添加圓角 */
+  padding: 10px; /* 增加內邊距 */
+  margin: 5px 0; /* 增加間距 */
+  border-left: 4px solid #007bff; /* 左側的顏色條 */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* 輕微陰影 */
+  font-size: 16px; /* 調整字體大小 */
+  color: #555; /* 深灰色字體 */
+}
+
+
+.div-line{
+  border-left: 3px solid rgb(0, 0, 0);
+  height: 100vh;
 }
 
 .leaderBoard {
@@ -165,6 +265,33 @@ li {
   overflow-y: auto; /* 如果内容溢出，则启用垂直滚动 */
 }
 
+.fullscreen-countdown {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 8rem; /* 調整字體大小使其明顯 */
+  color: white;
+  font-weight: bold;
+  z-index: 100; /* 保證在最上層 */
+  animation: countdown-animation 1s ease-out;
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.237);
+  height: 100vh;
+  width: 100vw;
+}
+
+/* 添加一個動畫讓倒數文字有縮放效果 */
+@keyframes countdown-animation {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
 /* 響應式處理，適應不同裝置大小 */
 @media (max-width: 768px) {
   .App {
