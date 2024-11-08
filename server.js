@@ -25,8 +25,8 @@ const io = socketIo(server, {
 
 // Spotify API 設置
 const spotifyApi = new SpotifyWebApi({
-  clientId: 'e73ae2e877b743f2a0c4375e9371929e',
-  clientSecret: '685b0f2ef62d45e580f765be567be29f'
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET
 });
 
 const playlists = {
