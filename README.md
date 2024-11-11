@@ -53,5 +53,4 @@ The server will run on http://localhost:3001 by default.
 Feel free to fork this repository and submit pull requests. Contributions are welcome!
 
 ## License
-   ```bash
-   This `README.md` is now ready to be added to your GitHub repository. Let me know if you want any further customization!
+This project is licensed under the MIT License.
