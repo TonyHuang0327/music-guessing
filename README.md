@@ -21,4 +21,5 @@ A multiplayer music guessing game built with Node.js, Express, Socket.IO, and th
    cd music-guessing
 2. **Install dependencies**
   ```bash
-  npm install
+   npm install
+3. **Set up Spotify API keys**
