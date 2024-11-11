@@ -11,13 +11,18 @@ function App() {
   const [roomLanguage, setRoomLanguage] = useState(''); // 新增 roomLanguage 狀態
   const [scores, setScores] = useState({});
 
-  const handleStartGame = (name, roomName, selectedLanguage) => {
+  const handleStartGame = (name, roomName, selectedLanguage, isPractice = false) => {
     setNickname(name);
     setRoom(roomName);
-    setRoomLanguage(selectedLanguage); // 更新 roomLanguage
-    socket.emit('joinRoom', { room: roomName, nickname: name });
+    setRoomLanguage(selectedLanguage);
+    
+    if (!isPractice) {
+        // 只有在非練習模式時才發送 joinRoom 事件
+        socket.emit('joinRoom', { room: roomName, nickname: name });
+    }
+    
     setGameState('game');
-  };
+};
 
   // 新增 handleJoinRoom 函數
   const handleJoinRoom = (name, roomName) => {
@@ -27,9 +32,10 @@ function App() {
   };
 
   const handleEndGame = (finalScores) => {
-    socket.emit('endGame', { room, finalScores }); // 将分数发送到服务器
+    setScores(finalScores);  // 將分數存到 scores 狀態
+    socket.emit('endGame', { room, finalScores });
     setGameState('result');
-  };
+};
 
   const handlePlayAgain = () => {
     setGameState('login');

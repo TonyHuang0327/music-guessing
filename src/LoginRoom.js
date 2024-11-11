@@ -53,9 +53,7 @@ function LoginRoom({ onStartGame, onJoinRoom }) {
 
   const handlePracticeModeStart = () => {
     if (roomLanguage) {
-      setNickname('practice');
-      setRoom('practice');
-      onStartGame('practice', 'practice', roomLanguage);
+      onStartGame('practice', null, roomLanguage); // 傳遞 null 作為房間，表示單人模式
       setShowPracticeModal(false); // 關閉彈窗
     } else {
       alert('請選擇題庫');

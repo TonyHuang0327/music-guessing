@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-export const socket = io('https://music-guessing-backend.vercel.app/?vercelToolbarCode=YZ8hFsteoPHekiC', {
+export const socket = io('http://localhost:3001', {
   withCredentials: true,
   transports: ['websocket']
 });

@@ -13,7 +13,6 @@ function GameBoard({ nickname, room, onEndGame, roomLanguage }) {
     const [isProcessingSong, setIsProcessingSong] = useState(false);
     const [currentRound, setCurrentRound] = useState(0);
     const [isHost, setIsHost] = useState(false);
-    const [playlist,setPlaylist] = useState(null);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
     
     const buttonColors = ['#00ff2f', '#ff2f00', '#2f00ff', '#ff00ff'];
@@ -129,7 +128,7 @@ function GameBoard({ nickname, room, onEndGame, roomLanguage }) {
                 setAudioInstance(null);
             }
         };
-    }, [audioInstance, nickname, room, players,roomLanguage]);
+    }, [audioInstance, nickname, room, players, roomLanguage, onEndGame, scores]);
 
     // 音樂播放錯誤處理
     useEffect(() => {

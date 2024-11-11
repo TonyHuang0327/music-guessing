@@ -3,13 +3,14 @@ const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const SpotifyWebApi = require('spotify-web-api-node');
+require('dotenv').config();
 
 const app = express();
 
 app.use(express.static('music-database'));
 
 app.use(cors({
-    origin: "https://music-guessing.vercel.app/",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true
 }));
@@ -17,7 +18,7 @@ app.use(cors({
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "https://music-guessing.vercel.app/",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -25,8 +26,8 @@ const io = socketIo(server, {
 
 // Spotify API 設置
 const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET
+  clientId: process.env.SPOTIFY_CLIENT_ID,
+  clientSecret: process.env.SPOTIFY_CLIENT_SECRET
 });
 
 const playlists = {
@@ -50,20 +51,19 @@ spotifyApi.clientCredentialsGrant().then(
 const rooms = new Map();
 const activeRooms = new Set();
 
+function getPlaylistId(roomData) {
+  return playlists[roomData.roomLanguage];
+}
+
 // 修改 stopCurrentSong 函數，確保徹底停止當前歌曲並清理狀態
 function stopCurrentSong(room) {
   const roomData = rooms.get(room);
   if (roomData) {
-    // 清除計時器
     if (roomData.timer) {
       clearTimeout(roomData.timer);
       roomData.timer = null;
     }
-    
-    // 發送停止信號給客戶端
     io.to(room).emit('stopSong');
-    
-    // 清除當前歌曲資訊
     roomData.currentSong = null;
   }
 }
@@ -111,14 +111,14 @@ io.on('connection', (socket) => {
     const countdownInterval = setInterval(() => {
       io.to(room).emit('countdown', countdownTime);
       countdownTime -= 1;
-
+  
       if (countdownTime < 0) {
         clearInterval(countdownInterval);
         stopCurrentSong(room);
         io.to(room).emit('gameStarted');
-        startNewRound(room);
+        startNewRound(room); // 開始新回合
       }
-    }, 1000); // 每秒更新倒數
+    }, 1000);
   }
 
   socket.on('getActiveRooms', () => {
@@ -171,17 +171,19 @@ io.on('connection', (socket) => {
     }
 });
 
-  socket.on('endGame', (room) => {
-    const roomData = rooms.get(room);
-    if (roomData) {
-      const finalScores = Array.from(roomData.players.values()).map(({ nickname, score }) => ({ nickname, score }));
-      io.to(room).emit('gameEnded', finalScores);
-      
-      // 清理房間數據
-      rooms.delete(room);
-      activeRooms.delete(room);
-    }
-  });  
+socket.on('endGame', (room) => {
+  const roomData = rooms.get(room);
+  if (roomData) {
+    roomData.isGameEnded = true;  // 標記遊戲已結束
+    const finalScores = Array.from(roomData.players.values()).map(({ nickname, score }) => ({ nickname, score }));
+    io.to(room).emit('gameEnded', finalScores);
+    
+    // 清理房間數據
+    stopCurrentSong(room);
+    rooms.delete(room);
+    activeRooms.delete(room);
+  }
+}); 
 
   socket.on('checkRoomExists', (room, callback) => {
     callback(rooms.has(room));
@@ -229,53 +231,38 @@ io.on('connection', (socket) => {
 // 修改 startNewRound 函數，確保在開始新回合前停止當前歌曲
 function startNewRound(room) {
   const roomData = rooms.get(room);
-  const playlistId = playlists[roomData.roomLanguage];
-  if (roomData) {
-    // 確保先停止當前歌曲
-    stopCurrentSong(room);
-    
-    // 等待一小段時間再開始新回合，確保音樂完全停止
-    setTimeout(() => {
-      // 重置提交答案列表
-      roomData.submittedAnswers = [];
+  if (!roomData || roomData.isGameEnded) return;  // 檢查遊戲是否已結束
+  
+  const playlistId = getPlaylistId(roomData);
+  stopCurrentSong(room);
+  roomData.submittedAnswers = [];
 
-      spotifyApi.getPlaylistTracks(playlistId)
-        .then(data => {
-          const tracks = data.body.items
-            .filter(item => item.track)
-            .map(item => ({
-              title: item.track.name,
-              artist: item.track.artists.map(artist => artist.name).join(', '),
-              url: item.track.preview_url
-            }))
-            .filter(track => track.url !== null);
-
-          if (tracks.length > 0) {
-            const randomSong = tracks[Math.floor(Math.random() * tracks.length)];
-            
-            // 設置新的當前歌曲
-            roomData.currentSong = {
-              ...randomSong,
-              correctAnswer: randomSong.title
-            };
-            
-            generateOptions(randomSong, room);
-            console.log(`Selected song: ${randomSong.title}`);
-
-            // 設置回合計時器
-            roomData.timer = setTimeout(() => {
-              io.to(room).emit('roundEnded', roomData.currentSong);
-              // 確保先停止當前歌曲再開始下一回合
-              startNewRound(room);
-            }, 10000); // 10 seconds per round
-          }
-        })
-        .catch(err => {
-          console.log('Error fetching Spotify tracks:', err);
-        });
-    }, 1000); // 等待1秒確保音樂完全停止
-  }
+  setTimeout(() => {
+    spotifyApi.getPlaylistTracks(playlistId)
+      .then(data => {
+        const tracks = data.body.items
+          .filter(item => item.track)
+          .map(item => ({
+            title: item.track.name,
+            artist: item.track.artists.map(artist => artist.name).join(', '),
+            url: item.track.preview_url
+          }))
+          .filter(track => track.url !== null);
+        
+        if (tracks.length > 0) {
+          const randomSong = tracks[Math.floor(Math.random() * tracks.length)];
+          roomData.currentSong = { ...randomSong, correctAnswer: randomSong.title };
+          generateOptions(randomSong, room);
+          roomData.timer = setTimeout(() => {
+            io.to(room).emit('roundEnded', roomData.currentSong);
+            startNewRound(room);
+          }, 10000); // 每回合10秒
+        }
+      })
+      .catch(err => console.log('Error fetching Spotify tracks:', err));
+  }, 1000);
 }
+
 
 
 function generateOptions(correctSong, room) {
